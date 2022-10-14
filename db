@@ -1,0 +1,443 @@
+Use master;
+		DROP DATABASE IF EXISTS dbReposDami
+
+-- Creando base de datos
+CREATE DATABASE dbReposDami
+GO
+
+-- Poner en uso la base de datos
+USE dbReposDami
+GO
+
+
+-- Creamos la tabla VENTA_DETALLE
+	DROP TABLE IF EXISTS VENTA_DETALLE ;
+CREATE TABLE VENTA_DETALLE (
+    IDVENTDET int IDENTITY (1,1),
+    IDVENT int,
+    IDPRO int,
+    CANTVENTDET int,
+    CONSTRAINT VENTA_DETALLE_pk PRIMARY KEY (IDVENTDET)
+)
+GO
+
+-- Creamos la tabla VENTA
+	DROP TABLE IF EXISTS VENTA ;
+CREATE TABLE VENTA (
+    IDVENT int IDENTITY (1,1),
+    FECHVENT date DEFAULT GETDATE(),
+    TIPVENT char(1),
+    IDCLI int,
+    IDVEND int,
+ESTVENT char(1) DEFAULT 'A',
+    CONSTRAINT VENTA_pk PRIMARY KEY (IDVENT)
+)
+GO
+
+-- Creamos la tabla COMPRA_DETALLE
+	DROP TABLE IF EXISTS COMPRA_DETALLE ;
+CREATE TABLE COMPRA_DETALLE (
+    IDCOMDET int IDENTITY (1,1),
+    IDINSU int,
+    IDCOM int,
+    CANTCOMDET int,
+PRECOMDET decimal (8,2),
+    CONSTRAINT COMPRA_DETALLE_pk PRIMARY KEY (IDCOMDET)
+)
+GO
+
+	DROP TABLE IF EXISTS COMPRA ;
+-- Creamos la tabla COMPRA
+CREATE TABLE COMPRA (
+    IDCOM int IDENTITY (1,1),
+    FECHCOM  date DEFAULT GETDATE(),
+TIPCOM char(1) DEFAULT 'T',
+    IDVEND int,
+    IDPROV int,
+ESTCOM char(1) DEFAULT 'A',
+    CONSTRAINT COMPRA_pk PRIMARY KEY (IDCOM)
+)
+GO
+
+
+-- Creamos la tabla CLIENTE
+	DROP TABLE IF EXISTS CLIENTE ;
+CREATE TABLE CLIENTE (
+    IDCLI int IDENTITY (1,1),
+    DNICLI char(8),
+    NOMCLI varchar(100),
+    APEPATCLI varchar(100),
+    APEMATCLI varchar(100),
+    CELCLI char(9),
+    EMACLI varchar(100),
+    DOMCLI varchar(100),
+    CODUBI char(6),
+    ESTCLI char(1) DEFAULT 'A',
+    CONSTRAINT CLIENTE_pk PRIMARY KEY (IDCLI)
+)
+GO
+
+-- Creamos la tabla PRODUCTO
+	DROP TABLE IF EXISTS PRODUCTO ;
+CREATE TABLE PRODUCTO (
+    IDPRO int IDENTITY (1,1),
+    NOMPRO varchar(100),
+    DESCPRO varchar(100),
+    PREPRO decimal(8,2),
+    STOCKPRO int,
+ESTPRO char(1) DEFAULT 'A',
+    CONSTRAINT PRODUCTO_pk PRIMARY KEY (IDPRO)
+)
+GO
+
+
+-- Creamos la tabla VENDEDOR
+	DROP TABLE IF EXISTS VENDEDOR ;
+CREATE TABLE VENDEDOR (
+    IDVEND int IDENTITY (1,1),
+    DNIVEND char(8),
+    NOMVEND varchar(100),
+    APEPATVEND varchar(100),
+    APEMATVEND varchar(100),
+    CELVEND char(9),
+    EMAVEND varchar(100),
+    DOMVEND varchar(100),
+    CODUBI char(6),
+    ESTVEND char(1) DEFAULT 'A',
+    CONSTRAINT VENDEDOR_pk PRIMARY KEY (IDVEND)
+)
+GO
+
+
+-- Creamos la tabla PROVEEDOR
+	DROP TABLE IF EXISTS PROVEEDOR ;
+CREATE TABLE PROVEEDOR (
+IDPROV int IDENTITY (1,1),
+RUCPROV char (11),
+RAZSOPROV varchar(100),
+EMAPROV varchar (100),
+    CELPROV char(9),
+    DIRPROV varchar(100),
+    CODUBI char(6),
+ESTPROV char(1) DEFAULT 'A',
+   CONSTRAINT PROVEEDOR_pk PRIMARY KEY (IDPROV)
+)
+GO
+
+
+-- Creamos la tabla INSUMO
+	DROP TABLE IF EXISTS INSUMO ;
+CREATE TABLE INSUMO (
+    IDINSU int IDENTITY (1,1),
+    NOMINSU varchar(100),
+DESCINSU varchar (100),
+CANTINSU int,
+ESTINSU char(1) DEFAULT 'A',
+    CONSTRAINT INSUMO_pk PRIMARY KEY (IDINSU)
+)
+GO
+
+
+-- Creamos la tabla UBIGEO
+	DROP TABLE IF EXISTS UBIGEO ;
+CREATE TABLE UBIGEO (
+    CODUBI char(6),
+    DEPUBI varchar(100),
+    PROVUBI varchar(100),
+    DISUBI varchar(100),
+    CONSTRAINT UBIGEO_pk PRIMARY KEY (CODUBI)
+)
+GO
+
+
+
+
+--RELACIONES
+
+-- Relacion entre UBIGEO a CLIENTE
+ALTER TABLE CLIENTE ADD CONSTRAINT CLIENTE_UBIGEO
+FOREIGN KEY (CODUBI)
+REFERENCES UBIGEO (CODUBI)  
+GO
+
+
+-- Relacion entre UBIGEO a PROVEEDOR
+ALTER TABLE PROVEEDOR ADD CONSTRAINT PROVEEDOR_UBIGEO
+FOREIGN KEY (CODUBI)
+REFERENCES UBIGEO (CODUBI)  
+GO
+
+-- Relacion entre UBIGEO a VENDEDOR
+ALTER TABLE VENDEDOR ADD CONSTRAINT VENDEDOR_UBIGEO
+FOREIGN KEY (CODUBI)
+REFERENCES UBIGEO (CODUBI)  
+GO
+
+
+-- Relacion entre PROVEEDOR a COMPRA
+ALTER TABLE COMPRA ADD CONSTRAINT COMPRA_PROVEEDOR
+FOREIGN KEY (IDPROV)
+REFERENCES PROVEEDOR (IDPROV)  
+GO
+
+-- Relacion entre VENDEDOR a COMPRA
+ALTER TABLE COMPRA ADD CONSTRAINT COMPRA_VENDEDOR
+FOREIGN KEY (IDVEND)
+REFERENCES VENDEDOR (IDVEND)  
+GO
+
+
+
+-- Relacion entre CLIENTE a VENTA
+ALTER TABLE VENTA ADD CONSTRAINT VENTA_CLIENTE
+FOREIGN KEY (IDCLI)
+REFERENCES CLIENTE (IDCLI)  
+GO
+
+
+
+-- Relacion entre PRODUCTO a VENTA_DETALLE
+ALTER TABLE VENTA_DETALLE ADD CONSTRAINT VENTA_DETALLE_PRODUCTO
+FOREIGN KEY (IDPRO)
+REFERENCES PRODUCTO (IDPRO)  
+GO
+
+
+-- Relacion entre VENDEDOR a VENTA
+ALTER TABLE VENTA ADD CONSTRAINT VENTA_VENDEDOR
+    FOREIGN KEY (IDVEND)
+    REFERENCES VENDEDOR (IDVEND)  
+GO
+
+
+
+-- Relacion entre INSUMO a COMPRA_DETALLE
+ALTER TABLE COMPRA_DETALLE ADD CONSTRAINT COMPRA_DETALLE_INSUMO
+FOREIGN KEY (IDINSU)
+REFERENCES INSUMO (IDINSU)  
+GO
+
+
+
+-- Relacion entre VENTA a VENTA_DETALLE
+ALTER TABLE VENTA_DETALLE ADD CONSTRAINT VENTA_DETALLE_VENTA
+FOREIGN KEY (IDVENT)
+REFERENCES VENTA (IDVENT)  
+GO
+
+
+
+-- Relacion entre COMPRA a COMPRA_DETALLE
+ALTER TABLE COMPRA_DETALLE ADD CONSTRAINT COMPRADETALLE_COMPRA
+FOREIGN KEY (IDCOM)
+REFERENCES COMPRA (IDCOM)  
+GO
+
+
+
+-- Inserción de datos
+
+--Insertamos datos a la tabla UBIGEO
+INSERT INTO UBIGEO
+(CODUBI, DEPUBI, PROVUBI, DISUBI)
+VALUES
+('150501','LIMA','CAÑETE','SAN VICENTE'),
+('150502','LIMA','CAÑETE','ASIA'),
+('150503','LIMA','CAÑETE','CALANGO'),
+('150504','LIMA','CAÑETE','CERRO AZUL'),
+('150505','LIMA','CAÑETE','CHILCA'),
+('150506','LIMA','CAÑETE','COAYLLO'),
+('150507','LIMA','CAÑETE','IMPERIAL'),
+('150508','LIMA','CAÑETE','LUNAHUANA'),
+('150509','LIMA','CAÑETE','MALA'),
+('150510','LIMA','CAÑETE','NUEVO IMPERIAL'),
+('150511','LIMA','CAÑETE','PACARAN'),
+('150512','LIMA','CAÑETE','QUILMANA'),
+('150513','LIMA','CAÑETE','SAN ANTONIO'),
+('150514','LIMA','CAÑETE','SAN LUIS'),
+('150515','LIMA','CAÑETE','SANTA CRUZ DE FLORES'),
+('150516','LIMA','CAÑETE','ZUÑIGA');
+GO
+
+-- Listar registro de UBIGEO
+
+Select * from UBIGEO
+GO
+
+
+
+--Insertamos datos a la tabla CLIENTE
+INSERT INTO CLIENTE
+(DNICLI, NOMCLI, APEPATCLI, APEMATCLI, CELCLI, EMACLI, DOMCLI, CODUBI)
+VALUES
+('73713789', 'Jhonn', 'Sotomayor','Sanchez','925589713','jhonn.sotomayor@vallegrande.edu.pe','Mz "D" Lt 3 Los Eucaliptos','150507'),
+('74388152', 'Max', 'Ramirez','Damian','928573318','Max.Ramirez@vallegrande.edu.pe','Mz "A" Lt 2 Los Aguerridos','150507'),
+('16638392', 'Pedro', 'Porras','Luyo','953135133','Pedro.Porras@vallegrande.edu.pe','Mz "B" Lt 5 Los campeones','150507'),
+('84272663', 'Luis', 'Valencia','Ramirez','999373857','luis.valencia@vallegrande.edu.pe','Mz "s" Lt 10 Los campeones','150511'),
+('32135723', 'Ernesto', 'Suarez','Yactaco','923384759','ernesto.suarez@vallegrande.edu.pe','Mz "B" Lt 16 Los libertadores','150507'),
+('37513781', 'Jeremy', 'Saenz','Gonzales','973837195','jeremy.saenz@vallegrande.edu.pe','Mz "J" Lt 22 Calle Alianza','150507'),
+('87331355', 'Lucy', 'Martinez','Ayala','993875562','lucy.martinez@vallegrande.edu.pe','Mz "J" Lt 23 Calle Alianza','150507'),
+('15825152', 'Maria', 'Sanchez','Paniagua','982582175','maria.sanchez@vallegrande.edu.pe','Mz "R" Lt 57 Calle Esperanza','150516'),
+('65728513', 'Cristian', 'Yaipen','Flores','997524624','cristian.yaipen@vallegrande.edu.pe','Mz "A" Lt 57 Calle Aguerridos','150513'),
+('15728577', 'Leonor', 'Cristensen','Saman','976482462','leonor.cristensen@gmail.com','Mz "X" Lt 10 Calle Principal','150505');
+GO
+
+-- Listar registro de CLIENTE
+
+Select * from CLIENTE
+GO
+
+
+
+--Insertamos datos a la tabla VENDEDOR
+INSERT INTO VENDEDOR
+(DNIVEND, NOMVEND, APEPATVEND, APEMATVEND, CELVEND, EMAVEND, DOMVEND, CODUBI)
+VALUES
+('17883718', 'Carlos', 'Dominguez','Tadeo','925586113','Carlos.dominguez@vallegrande.edu.pe','Mz "D" Lt 3 Señor de los Milagros','150505'),
+('16317986', 'Jeferson', 'Farfan','Rodriguez','968857383','jeferson.farfan@vallegrande.edu.pe','Mz "M" Lt 14 Señor de Cipan','150505'),
+('75822024', 'Paolo', 'Guerrero','Nardi','938577173','Paolo.guerrero@vallegrande.edu.pe','Mz "N" Lt 7 Los Deportistas','150516'),
+('37816174', 'Kenyi','Gallardo','Saman','948847295', 'Kenyi.gallardo@vallegrande.edu.pe','Mz "S" Lt Independencia', '150516');
+GO
+
+-- Listar registro de VENDEDOR
+
+Select * from VENDEDOR
+GO
+
+
+--Insertamos datos a la tabla PROVEEDOR
+INSERT INTO PROVEEDOR
+(RUCPROV, RAZSOPROV, EMAPROV, CELPROV, DIRPROV, CODUBI)
+VALUES
+('20600929632', 'Leche Gloria', 'leche.gloria@gmail.com','937558373','Mz "V" Lt 12 Señor de los Milagros','150506'),
+('43982527837', 'Blanca Flor', 'blanca.flor@hotmail.com', '988758752','Mz M Lt 14 Señor de Cipan','150512'),
+('68712361433', 'La Calera', 'LaCalera.1@gmail.com','958837281','Mz "N" Lt 7 Los Deportistas','150516'),
+('84738195137', 'Costeño', 'Costeño,1@gmail.com','918351136','Mz "R" Lt 7 Los Girasoles','150511');
+GO
+
+-- Listar registro de PROVEEDOR
+
+Select * from PROVEEDOR
+GO
+
+
+--Insertamos datos a la tabla PRODUCTO
+INSERT INTO PRODUCTO
+(NOMPRO, DESCPRO, PREPRO, STOCKPRO)
+VALUES
+('Tortas', 'Ofrecemos tortas de tres leches, de chocolate', '70.00','20'),
+('Alfajores', 'Dulces de casa', '15.50','30'),
+('Milonjas', 'Buen sabor y precio', '10.80','10'),
+('Budin', 'Sabores de pasas de uva', '5.00','15'),
+('Pay', 'Sabores de maracuyá, limón, gelatina', '3.50','30'),
+('Gelatinas', 'Elaborados en casa', '2.50','17'),
+('Mazamorras', 'Dulces para alegrar el día', '2.00','12');
+
+-- Listar registro de PRODUCTO
+
+Select * from PRODUCTO
+GO
+
+
+
+--Insertamos datos a la tabla INSUMO
+INSERT INTO INSUMO
+(NOMINSU, DESCINSU, CANTINSU)
+VALUES
+('Huevos','1 kilo','12'),
+('Harina','1 kilo','15'),
+('Leche','1 Litro','20'),
+('Azúcar','1 kilo','10');
+
+
+-- Listar registro de INSUMO
+
+Select * from INSUMO
+GO
+
+
+--Insertamos datos a la tabla VENTA
+INSERT INTO VENTA
+(TIPVENT, IDCLI, IDVEND)
+VALUES
+('T', '1', '1'),
+('T', '2', '2'),
+('F', '3', '3'),
+('F', '4', '4'),
+('T', '5', '4');
+
+
+
+-- Listar registro de VENTA
+
+Select * from VENTA
+GO
+
+
+--Insertamos datos a la tabla VENTA_DETALLE
+INSERT INTO VENTA_DETALLE
+(IDVENT, IDPRO,CANTVENTDET)
+VALUES
+('1', '5', '12'),
+('2', '7', '14'),
+('3', '1', '6'),
+('4', '2', '9'),
+('5', '3', '6'),
+('5', '5', '2'),
+('2', '2', '4'),
+('3', '6', '20'),
+('3', '1', '3'),
+('1', '3', '9');
+
+select * from VENTA_DETALLE
+GO
+
+
+
+--Insertamos datos a la tabla COMPRA
+INSERT INTO COMPRA
+(IDVEND, IDPROV)
+VALUES
+('1','1'),
+('2','2'),
+('3','3'),
+('4','4'),
+('3','4'),
+('2','1'),
+('2','3'),
+('4','4'),
+('1','2'),
+('3','4');
+
+
+
+-- Listar registro de COMPRA
+
+Select * from COMPRA
+GO
+
+
+--Insertamos datos a la tabla COMPRA_DETALLE
+INSERT INTO COMPRA_DETALLE
+(IDINSU, IDCOM, CANTCOMDET, PRECOMDET)
+VALUES
+('1', '1', '12', '20.00'),
+('2', '2','12', '15.00'),
+('3', '3','4', '12.00'),
+('4', '4','10', '12.50'),
+('4', '5','12', '10.80'),
+('2', '6','20', '7.50'),
+('4', '7','6', '5.00'),
+('3', '8','10', '14.40'),
+('1', '9','7', '12.50'),
+('3', '10','17','15.00');
+
+
+
+-- Listar registro de COMPRA_DETALLE
+
+Select * from COMPRA_DETALLE
+GO
+
+
+
